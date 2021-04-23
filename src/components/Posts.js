@@ -48,7 +48,7 @@ const Posts = () => {
         <div
             className="App">
             <h1>Scalable Path - React Test</h1>
-            { posts.map((post) => {
+            { posts.slice(0, 10).map((post) => {
                 const author = authors ? authors.find((item) => item.id === post.userId) : [];
                 return (
                     <div
