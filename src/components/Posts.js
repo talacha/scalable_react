@@ -23,7 +23,7 @@ const Posts = () => {
         };
         // Load posts.
         axios
-            .get('http://jsonplaceholder.typicode.com/posts', config)
+            .get('/posts.json', config)
             .then(resp => resp.data)
             .then(data => {
                 setPosts(data);
