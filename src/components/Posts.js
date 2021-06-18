@@ -1,70 +1,44 @@
-import React, { useEffect, useState } from "react";
-
-import axios from "axios";
+import React from  'react';
+import { useApi } from '../hooks/useApi';
+import './Posts.css';
 
 const Empty = () => (
     <div>No articles found.</div>
 );
 
-// const Post = ({userId, id, title, body, author}) => (
-//     <li className="post" key={id}>
-//         <h4>{title}</h4> {author}
-//         <p>{body}</p>
-//     </li>
-// );
-
 const Posts = () => {
-    const [posts, setPosts] = useState([]);
-    const [authors, setAuthors] = useState([]);
 
-    useEffect(() => {
-        const config = {
-            headers: {'Access-Control-Allow-Origin': '*'}
-        };
-        // Load posts.
-        axios
-            .get('/posts.json', config)
-            .then(resp => resp.data)
-            .then(data => {
-                setPosts(data);
-            })
-            .then(
-                axios
-                    .get('/users.json')
-                    .then(resp => resp.data)
-                    .then(data => {
-                        setAuthors(data);
-                    })
-                    .catch(err => console.log('There was an error accessing the API', err))
-            )
-            .catch(err => console.log('There was an error accessing the API', err))
-    }, [])
-
-    if (!posts || posts.length === 0) {
-        return (<Empty/>);
+    // Get the fetched API data.
+    const { posts, users } = useApi();
+  
+    // Combine the two endoints and build the result items.
+    const items = () => {
+      return posts.map(post => {
+        // Author by line.
+        users.map(user => {
+          if (user.id === post.userId) {
+            post.author = `By ${user.name}`;
+          }
+          return user;
+        })
+        return post;
+      });
     }
-
+    
     return (
-        <div
-            className="App">
+      <>
+        <div className="App">
             <h1>Scalable Path - React Test</h1>
-            { posts.slice(0, 10).map((post) => {
-                const author = authors ? authors.find((item) => item.id === post.userId) : [];
-                return (
-                    <div
-                        className="blogs" key={post.id}>
-                        <div
-                            className="blogsPost">
-                            <h2 className="postTitle">{post.title}</h2>
-                            <span key={author.id}>by {author.name}</span>
-                            <p className="postbody">{post.body}</p>
-                        </div>
-                    </div>
-                );
-            })}
-            Written for <img alt="Scalable Path" src="/img/scalable_path_logo.png" width="276" height="45" />
+            {items().length ? items().map(item => (
+                <div key={item.id} class='text-left'>
+                    <h2 class="capitalize">{item.title}</h2>
+                    <span>{item.author}</span>
+                    <p>{item.body}</p>
+                </div>
+            )) : <Empty/> }
         </div>
+      </>
     );
-}
-
-export default Posts;
+  }
+  
+  export default Posts;
